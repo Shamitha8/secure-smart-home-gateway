@@ -47,6 +47,36 @@ def initialize_database():
         tcp_flags TEXT
     )
 """)
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS user_devices (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                device_id INTEGER NOT NULL,
+                access_role TEXT NOT NULL DEFAULT 'owner',
+                assigned_at TEXT NOT NULL,
+
+                FOREIGN KEY (user_id)
+                    REFERENCES users(id)
+                    ON DELETE CASCADE,
+
+                FOREIGN KEY (device_id)
+                    REFERENCES devices(id)
+                    ON DELETE CASCADE,
+
+                UNIQUE (user_id, device_id)
+            )
+        """)
+        
 
         connection.commit()
 
